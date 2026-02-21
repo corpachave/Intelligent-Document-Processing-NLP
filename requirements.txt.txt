@@ -1,0 +1,14 @@
+torch
+transformers
+datasets
+spacy
+scikit-learn
+pandas
+numpy
+pdfplumber
+pytesseract
+opencv-python
+fastapi
+uvicorn
+sqlalchemy
+psycopg2-binary
