@@ -7,9 +7,9 @@ def extract_text_from_pdf(pdf_path):
             text += page.extract_text() + "\n"
     return text
 
-text = extract_text_from_pdf(r"E:\Learning\Zaamila Development\Project details\Projects\Fintech---Intelligent-Document-Processing-NLP\data\raw_pdfs\sample_agreement.pdf")
+text = extract_text_from_pdf(r"E:\Learning\Zaamila Development\Projects\Fintech---Intelligent-Document-Processing-NLP\data\raw_pdfs\sample_agreement.pdf")
 
-with open(r"E:\Learning\Zaamila Development\Project details\Projects\Fintech---Intelligent-Document-Processing-NLP\data\raw_pdfs\sample_agreement.pdf", "w", encoding="utf-8") as f:
+with open(r"E:\Learning\Zaamila Development\Projects\Fintech---Intelligent-Document-Processing-NLP\data\raw_pdfs\sample_agreement.pdf", "w", encoding="utf-8") as f:
     f.write(text)
 
 print("Extraction complete.")
