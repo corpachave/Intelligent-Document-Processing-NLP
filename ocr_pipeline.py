@@ -22,4 +22,9 @@ def preprocess_image(pil_image):
     
     return thresh
 
-print(pages)
+processed = preprocess_image(pages[2])
+
+from PIL import Image
+processed_pil = Image.fromarray(processed)
+
+processed_pil.show()
