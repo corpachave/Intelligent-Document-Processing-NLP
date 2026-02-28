@@ -12,3 +12,5 @@ fastapi
 uvicorn
 sqlalchemy
 psycopg2-binary
+pdf2image
+jiwer
