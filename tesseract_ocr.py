@@ -1,9 +1,7 @@
 import pytesseract
-
 pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
 ## Run Tesseract OCR
-import pytesseract
 from pdf2image import convert_from_path
 from PIL import Image
 import cv2
