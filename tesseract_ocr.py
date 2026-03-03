@@ -1,3 +1,7 @@
+import pytesseract
+
+pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+
 ## Run Tesseract OCR
 import pytesseract
 from pdf2image import convert_from_path
@@ -31,8 +35,8 @@ def extract_scanned_text(pdf_path):
     
     return full_text
 
-result = ocr_image("")
-print(result)
+result = ocr_image(r"E:\Learning\Zaamila Development\Projects\Fintech-Intelligent-Document-Processing-NLP\data\raw_pdfs\scanned_pdf_samples\scanned_image_jpg.jpg")
+print("Result:\n",result)
 
 pdf_text = extract_scanned_text(r"E:\Learning\Zaamila Development\Projects\Fintech-Intelligent-Document-Processing-NLP\data\raw_pdfs\loan_agreement_01.pdf")
-print(pdf_text)
+print("PDF Text: \n",pdf_text)
