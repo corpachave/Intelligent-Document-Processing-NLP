@@ -38,3 +38,18 @@ print("Result:\n",result)
 
 pdf_text = extract_scanned_text(r"E:\Learning\Zaamila Development\Projects\Fintech-Intelligent-Document-Processing-NLP\data\raw_pdfs\loan_agreement_01.pdf")
 print("PDF Text: \n",pdf_text)
+
+# OCR Noise Cleaning
+import re
+
+def clean_text(text):
+    # Remove multiple spaces
+    text = re.sub(r'\s+', ' ', text)
+    
+    # Remove page numbers
+    text = re.sub(r'Page \d+', '', text)
+    
+    # Fix broken line hyphenation
+    text = re.sub(r'-\s+', '', text)
+    
+    return text.strip()

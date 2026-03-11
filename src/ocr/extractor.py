@@ -1,17 +1,45 @@
-#1 SRC/OCR/Extractor - Module
 
-import pdfplumber
-from pdf2image import convert_from_path
+import os
+from pathlib import Path
 import cv2
 import numpy as np
+import pdfplumber
+from pdf2image import convert_from_path
 import pytesseract
+
+
+_DEFAULT_TESSERACT_PATHS = [
+    r"C:\Program Files\Tesseract-OCR\tesseract.exe",
+    r"C:\Program Files (x86)\Tesseract-OCR\tesseract.exe",
+]
+
+
+def _configure_tesseract_cmd() -> None:
+
+    env_path = os.environ.get("TESSERACT_CMD") or os.environ.get("TESSERACT_PATH")
+    if env_path:
+        pytesseract.pytesseract.tesseract_cmd = env_path
+        return
+
+    if pytesseract.pytesseract.tesseract_cmd and pytesseract.pytesseract.tesseract_cmd != "tesseract":
+        return
+
+    for candidate in _DEFAULT_TESSERACT_PATHS:
+        if Path(candidate).exists():
+            pytesseract.pytesseract.tesseract_cmd = str(candidate)
+            return
+
+
+_configure_tesseract_cmd()
 
 
 def is_scanned_pdf(pdf_path: str) -> bool:
     with pdfplumber.open(pdf_path) as pdf:
         first_page = pdf.pages[0]
         text = first_page.extract_text()
-        return text is None
+        # pdfplumber returns None when there is no embedded text;
+        # treat empty / whitespace-only text as scanned image data.
+        return not text or not text.strip()
 
 
 def extract_digital_text(pdf_path: str) -> str:
@@ -44,7 +72,5 @@ def extract_scanned_text(pdf_path: str, dpi: int = 300) -> str:
 
 def extract_text(pdf_path: str) -> str:
     if is_scanned_pdf(pdf_path):
-        print("Using OCR pipeline...")
         return extract_scanned_text(pdf_path)
-    print("Using digital extraction...")
     return extract_digital_text(pdf_path)
