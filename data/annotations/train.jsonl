@@ -1,0 +1,2 @@
+{"text": "This Agreement is made effective as of 2025-12-01.", "entities": [[39, 49, "DATE"], [5, 14, "AGREEMENT"]]}
+{"text": "Client will pay USD 1,234.56 upon execution.", "entities": [[16, 19, "CURRENCY"], [20, 28, "AMOUNT"]]}

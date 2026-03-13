@@ -26,9 +26,9 @@ async def extract_pdf(file: UploadFile = File(...)):
 
     try:
         result = extract_entities_from_pdf(tmp_path)
-        finally:
+        return result
+    finally:
         try:
             os.remove(tmp_path)
         except OSError:
             pass
-    return result
