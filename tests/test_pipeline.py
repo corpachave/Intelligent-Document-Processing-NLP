@@ -22,7 +22,7 @@ class TestPipeline(unittest.TestCase):
 
         mock_extract_text.assert_called_once_with("dummy.pdf")
         mock_load_model.assert_called_once_with("models/ner")
-        mock_extract_entities.assert_called_once_with("dummy model", "dummy text")
+        mock_extract_entities.assert_called_once_with("dummy model", "dummy text", strict_mode=False)
         mock_validate.assert_called_once()
 
-        self.assertEqual(result, {"text": "dummy text", "entities": [{"text": "a", "label": "X", "start": 0, "end": 1, "valid": True}]})
+        self.assertEqual(result, {"text": "dummy text", "entities": [{"text": "a", "label": "X", "start": 0, "end": 1, "valid": True}], "clauses": []})

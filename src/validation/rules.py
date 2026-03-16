@@ -7,11 +7,14 @@ from typing import Dict, List
 
 ## Date Pattern (YYYY-MM-DD)
 ### NOTE: We intentionally do not enforce strict numeric validity (e.g. month/day ranges).
-DATE_RE = re.compile(r"\b(20\d{2}-\d{2}-\d{2})\b")
+DATE_RE = re.compile(r"\b\d{4}-\d{2}-\d{2}\b")
 
 ## Amount Pattern
 ### The regex is meant to match common currency formats (USD/$) in free-form text.
-AMOUNT_RE = re.compile(r"(?:USD|US\$|\$)\s?\d{1,3}(?:,\d{3})*(?:\.\d{2})?")
+AMOUNT_RE = re.compile(r"(?:USD|US\$|\$)\s?\d+(?:,\d{3})*(?:\.\d+)?")
+
+## Clause pattern (for simple label validation)
+CLAUSE_RE = re.compile(r"\b(clause|agreement|section|article)\b", flags=re.IGNORECASE)
 
 ## Termination Clause Pattern
 TERMINATION_RE = re.compile(r"\b(termination|terminate|terminated)\b", flags=re.IGNORECASE)
@@ -67,19 +70,20 @@ def validate_entities(entities: List[Dict]) -> List[Dict]:
     validated = []
     # Loop Through Entities
     for ent in entities:
-        # Extract Label and Text
         label = ent.get("label", "").lower()
         text = ent.get("text", "")
         ok = True
-        # Run Correct Validator
+
         if label == "date":
             ok = validate_date(text)
-        elif label in {"amount", "dollar_amount"}:
+        elif label in {"money", "amount", "dollar_amount"}:
             ok = validate_amount(text)
         elif label in {"termination", "termination_clause"}:
             ok = validate_termination(text)
-        # (Party names can be skipped or optionally validated)
+        elif label == "clause":
+            ok = bool(CLAUSE_RE.search(text))
+        elif label == "law":
+            ok = len(text) > 3
 
-        # Append Validation Result
         validated.append({**ent, "valid": ok})
     return validated

@@ -208,7 +208,7 @@ Examples:
         parser.print_help()
         return
 
-    print("🚀 Fintech Document Processing Pipeline")
+    print("Fintech Document Processing Pipeline")
     print("=" * 50)
 
     success = True

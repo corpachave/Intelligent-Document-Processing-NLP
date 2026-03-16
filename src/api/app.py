@@ -18,11 +18,11 @@ class Clause(BaseModel):
 class ExtractionResponse(BaseModel):
     text: str
     entities: list
-    clauses: list[Clause]
+    clauses: list[Clause] = []
 
 
 @app.post("/extract", response_model=ExtractionResponse)
-async def extract_pdf(file: UploadFile = File(...)):
+async def extract_pdf(file: UploadFile = File(...), strict: bool = False):
     if not file.filename.lower().endswith(".pdf"):
         raise HTTPException(status_code=400, detail="Only PDF files are supported")
 
@@ -31,7 +31,9 @@ async def extract_pdf(file: UploadFile = File(...)):
         tmp_path = tmp.name
 
     try:
-        result = extract_entities_from_pdf(tmp_path)
+        result = extract_entities_from_pdf(tmp_path, strict_mode=strict)
+        if "clauses" not in result:
+            result["clauses"] = []
         return result
     finally:
         try:

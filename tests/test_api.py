@@ -26,7 +26,7 @@ class TestApi(unittest.TestCase):
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), {"text": "abc", "entities": []})
+        self.assertEqual(response.json(), {"text": "abc", "entities": [], "clauses": []})
         mock_extract.assert_called_once()
 
     def test_extract_pdf_invalid_extension(self):
@@ -36,3 +36,15 @@ class TestApi(unittest.TestCase):
         )
 
         self.assertEqual(response.status_code, 400)
+
+    @patch("src.api.app.extract_entities_from_pdf")
+    def test_extract_pdf_strict_query_parameter(self, mock_extract):
+        mock_extract.return_value = {"text": "abc", "entities": []}
+        response = self.client.post(
+            "/extract?strict=true",
+            files={"file": ("test.pdf", b"%PDF-1.4\n%EOF", "application/pdf")},
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {"text": "abc", "entities": [], "clauses": []})
+        mock_extract.assert_called_once()
+        self.assertTrue(mock_extract.call_args.kwargs.get("strict_mode", False))

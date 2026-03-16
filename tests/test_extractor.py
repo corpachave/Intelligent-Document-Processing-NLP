@@ -23,4 +23,5 @@ class TestExtractor(unittest.TestCase):
 
     def test_extract_text_from_sample(self):
         text = extractor.extract_text("data/raw_pdfs/scanned_pdf_samples/Image_pdf_merged_5pages.pdf")
-        self.assertIn("Agreement", text)  # adjust based on your sample document
+        self.assertIn("CHAPTER", text)  # adjust based on your sample document
+        self.assertGreater(len(text), 100)

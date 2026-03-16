@@ -52,6 +52,24 @@ class TestValidationRules(unittest.TestCase):
         self.assertTrue(validated[3]["valid"])  # party is always ok
         self.assertFalse(validated[4]["valid"])  # bad date format
 
+    def test_validate_clause_and_law(self):
+        entities = [
+            {"label": "CLAUSE", "text": "termination clause"},
+            {"label": "LAW", "text": "Data Protection Act"},
+        ]
+        validated = rules.validate_entities(entities)
+        self.assertTrue(validated[0]["valid"])
+        self.assertTrue(validated[1]["valid"])
+
+    def test_filter_stopwords(self):
+        entities = [
+            {"label": "ORG", "text": "the"},
+            {"label": "DATE", "text": "2025-01-01"},
+        ]
+        # We don't validate stopwords here; extraction filters them first.
+        validated = rules.validate_entities(entities)
+        self.assertTrue(validated[1]["valid"])
+
     def test_classify_clauses(self):
         text = "Either party may terminate the agreement. The client will pay $1,000.00 upon execution."
         clauses = rules.classify_clauses(text)

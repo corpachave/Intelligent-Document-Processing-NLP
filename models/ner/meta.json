@@ -18,10 +18,12 @@
   },
   "labels":{
     "ner":[
-      "AGREEMENT",
-      "AMOUNT",
-      "CURRENCY",
-      "DATE"
+      "CLAUSE",
+      "DATE",
+      "LAW",
+      "MONEY",
+      "ORG",
+      "PERSON"
     ]
   },
   "pipeline":[
