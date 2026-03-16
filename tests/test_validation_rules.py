@@ -12,6 +12,8 @@ from src.validation import rules
 
 class TestValidationRules(unittest.TestCase):
     def test_validate_date(self):
+        self.assertTrue(rules.validate_date("2025-12-01"))
+        self.assertFalse(rules.validate_date("Dec 1 2025"))
         self.assertTrue(rules.validate_date("2025-12-31"))
         self.assertTrue(rules.validate_date("Ends on 2025-12-31."))
         self.assertFalse(rules.validate_date("12/31/2025"))
@@ -19,6 +21,8 @@ class TestValidationRules(unittest.TestCase):
         self.assertTrue(rules.validate_date("2025-13-01"))
 
     def test_validate_amount(self):
+        self.assertTrue(rules.validate_amount("$1,234.56"))
+        self.assertTrue(rules.validate_amount("USD 10,000.00"))
         self.assertTrue(rules.validate_amount("$1,000.00"))
         self.assertTrue(rules.validate_amount("USD 250"))
         self.assertTrue(rules.validate_amount("US$ 3,500"))
@@ -47,6 +51,21 @@ class TestValidationRules(unittest.TestCase):
         self.assertTrue(validated[2]["valid"])
         self.assertTrue(validated[3]["valid"])  # party is always ok
         self.assertFalse(validated[4]["valid"])  # bad date format
+
+    def test_classify_clauses(self):
+        text = "Either party may terminate the agreement. The client will pay $1,000.00 upon execution."
+        clauses = rules.classify_clauses(text)
+        types = {c["type"] for c in clauses}
+        self.assertIn("termination_clause", types)
+        self.assertIn("payment_clause", types)
+
+    def test_validate_date_additional(self):
+        assert rules.validate_date("2025-12-01")
+        assert not rules.validate_date("Dec 1 2025")
+
+    def test_validate_amount_additional(self):
+        assert rules.validate_amount("$1,234.56")
+        assert rules.validate_amount("USD 10,000.00")
 
 
 if __name__ == "__main__":

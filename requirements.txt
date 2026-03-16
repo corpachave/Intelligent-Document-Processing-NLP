@@ -10,6 +10,7 @@ pytesseract
 opencv-python
 fastapi
 uvicorn
+python-multipart
 sqlalchemy
 psycopg2-binary
 pdf2image

@@ -12,3 +12,5 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     train_ner(output_dir=args.output, train_path=args.train, dev_path=args.dev, n_iter=args.iters)
+
+    

@@ -2,7 +2,7 @@
 ## src/pipeline.py
 from src.ocr.extractor import extract_text
 from src.ner.model import load_model, extract_entities
-from src.validation.rules import validate_entities
+from src.validation.rules import validate_entities, classify_clauses
 
 DEFAULT_MODEL_DIR = "models/ner"
 
@@ -12,4 +12,5 @@ def extract_entities_from_pdf(pdf_path: str, model_dir: str = DEFAULT_MODEL_DIR)
     model = load_model(model_dir)
     entities = extract_entities(model, text)
     validated = validate_entities(entities)
-    return {"text": text, "entities": validated}
+    clauses = classify_clauses(text)
+    return {"text": text, "entities": validated, "clauses": clauses}

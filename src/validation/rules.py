@@ -30,6 +30,36 @@ def validate_amount(entity_text: str) -> bool:
 def validate_termination(entity_text: str) -> bool:
     return bool(TERMINATION_RE.search(entity_text))
 
+# Clause classification (simple rule-based)
+
+def classify_clauses(text: str) -> List[Dict]:
+    """Extract clause-like spans and classify them by type."""
+
+    clause_patterns = {
+        "termination_clause": [r"\bterminate\b", r"\btermination\b", r"\bend of term\b"],
+        "payment_clause": [r"\bpay\b", r"\bpayment\b", r"\bfee\b", r"\binvoice\b"],
+        "confidentiality_clause": [r"\bconfidential\b", r"\bnon[- ]disclosure\b"],
+        "governing_law_clause": [r"\bgoverning law\b", r"\blaw of\b", r"\bjurisdiction\b"],
+        "indemnification_clause": [r"\bindemnify\b", r"\bindemnification\b"],
+        "force_majeure_clause": [r"\bforce majeure\b", r"\bacts of god\b"],
+    }
+
+    sentences = [s.strip() for s in re.split(r"(?<=[.?!])\s+", text) if s.strip()]
+    clauses: List[Dict] = []
+
+    for sentence in sentences:
+        lower = sentence.lower()
+        for clause_type, patterns in clause_patterns.items():
+            for pat in patterns:
+                if re.search(pat, lower):
+                    clauses.append({"type": clause_type, "text": sentence})
+                    break
+            else:
+                continue
+            break
+
+    return clauses
+
 # Main Validation Pipeline
 
 ## Function

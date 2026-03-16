@@ -10,9 +10,15 @@ from src.pipeline import extract_entities_from_pdf
 app = FastAPI(title="LexiScan Auto - Contract Entity Extractor")
 
 
+class Clause(BaseModel):
+    type: str
+    text: str
+
+
 class ExtractionResponse(BaseModel):
     text: str
     entities: list
+    clauses: list[Clause]
 
 
 @app.post("/extract", response_model=ExtractionResponse)
