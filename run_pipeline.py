@@ -36,36 +36,36 @@ from src.ocr.extractor import extract_text
 
 def check_requirements():
     """Check if all required files and models exist."""
-    print("🔍 Checking requirements...")
+    print("Checking requirements...")
 
     # Check training data
     train_file = ROOT_DIR / "data" / "annotations" / "train.jsonl"
     if not train_file.exists():
-        print(f"❌ Training data not found: {train_file}")
+        print(f"Training data not found: {train_file}")
         return False
 
     # Check if model exists
     model_dir = ROOT_DIR / "models" / "ner"
     if not model_dir.exists():
-        print(f"⚠️  NER model not found: {model_dir}")
-        print("   Will train model automatically...")
+        print(f"NER model not found: {model_dir}")
+        print("Will train model automatically...")
     else:
-        print(f"✅ NER model found: {model_dir}")
+        print(f"NER model found: {model_dir}")
 
-    print("✅ Requirements check passed")
+    print("Requirements check passed")
     return True
 
 
 def train_model(force: bool = False):
     """Train the NER model if it doesn't exist or force retrain."""
-    print("\n🤖 Training NER Model...")
+    print("\nTraining NER Model...")
 
     model_dir = ROOT_DIR / "models" / "ner"
     train_file = ROOT_DIR / "data" / "annotations" / "train.jsonl"
     dev_file = ROOT_DIR / "data" / "annotations" / "dev.jsonl"
 
     if model_dir.exists() and not force:
-        print(f"✅ Model already exists at {model_dir}")
+        print(f"Model already exists at {model_dir}")
         return True
 
     try:
@@ -75,33 +75,33 @@ def train_model(force: bool = False):
             dev_path=str(dev_file) if dev_file.exists() else None,
             n_iter=30
         )
-        print(f"✅ Model trained successfully at {model_dir}")
+        print(f"Model trained successfully at {model_dir}")
         return True
     except Exception as e:
-        print(f"❌ Training failed: {e}")
+        print(f"Training failed: {e}")
         return False
 
 
 def process_pdf(pdf_path: str, output_path: str = None) -> Dict[str, Any]:
     """Process a single PDF through the entire pipeline."""
-    print(f"\n📄 Processing PDF: {pdf_path}")
+    print(f"\nProcessing PDF: {pdf_path}")
 
     if not Path(pdf_path).exists():
         raise FileNotFoundError(f"PDF not found: {pdf_path}")
 
     try:
         # Extract text first
-        print("   📖 Extracting text...")
+        print("Extracting text...")
         text = extract_text(pdf_path)
-        print(f"   ✅ Extracted {len(text)} characters")
+        print(f"Extracted {len(text)} characters")
 
         # Extract entities
-        print("   🧠 Extracting entities...")
+        print("Extracting entities...")
         result = extract_entities_from_pdf(pdf_path)
 
         # Show summary
         entities = result.get("entities", [])
-        print(f"   ✅ Found {len(entities)} entities")
+        print(f"Found {len(entities)} entities")
 
         # Count by type
         entity_counts = {}
@@ -109,7 +109,7 @@ def process_pdf(pdf_path: str, output_path: str = None) -> Dict[str, Any]:
             label = ent.get("label", "UNKNOWN")
             entity_counts[label] = entity_counts.get(label, 0) + 1
 
-        print("   📊 Entity breakdown:")
+        print("Entity breakdown:")
         for label, count in entity_counts.items():
             print(f"      {label}: {count}")
 
@@ -117,18 +117,18 @@ def process_pdf(pdf_path: str, output_path: str = None) -> Dict[str, Any]:
         if output_path:
             with open(output_path, "w", encoding="utf-8") as f:
                 json.dump(result, f, indent=2, ensure_ascii=False)
-            print(f"   💾 Saved results to: {output_path}")
+            print(f"Saved results to: {output_path}")
 
         return result
 
     except Exception as e:
-        print(f"❌ Processing failed: {e}")
+        print(f"Processing failed: {e}")
         raise
 
 
 def run_tests():
     """Run all unit tests."""
-    print("\n🧪 Running Tests...")
+    print("\nRunning Tests...")
 
     try:
         # Use unittest to run tests
@@ -141,28 +141,28 @@ def run_tests():
             print("STDERR:", result.stderr)
 
         if result.returncode == 0:
-            print("✅ All tests passed!")
+            print("All tests passed!")
             return True
         else:
-            print("❌ Some tests failed!")
+            print("Some tests failed!")
             return False
 
     except Exception as e:
-        print(f"❌ Test execution failed: {e}")
+        print(f"Test execution failed: {e}")
         return False
 
 
 def start_api(host: str = "0.0.0.0", port: int = 8001):
     """Start the FastAPI server."""
-    print(f"\n🚀 Starting API server on {host}:{port}...")
+    print(f"\n Starting API server on {host}:{port}...")
 
     try:
         # Import here to avoid loading if not needed
         import uvicorn
 
-        print("🌐 API endpoints:")
-        print(f"   POST http://localhost:{port}/extract - Upload PDF for processing")
-        print(f"   GET  http://localhost:{port}/docs - Interactive API documentation")
+        print("API endpoints:")
+        print(f"POST http://localhost:{port}/extract - Upload PDF for processing")
+        print(f"GET  http://localhost:{port}/docs - Interactive API documentation")
         print("\nPress Ctrl+C to stop the server\n")
 
         uvicorn.run(
@@ -174,9 +174,9 @@ def start_api(host: str = "0.0.0.0", port: int = 8001):
         )
 
     except KeyboardInterrupt:
-        print("\n🛑 Server stopped by user")
+        print("\nServer stopped by user")
     except Exception as e:
-        print(f"❌ Failed to start API: {e}")
+        print(f"Failed to start API: {e}")
 
 
 def main():
@@ -232,9 +232,9 @@ Examples:
     if args.process:
         try:
             result = process_pdf(args.process, args.output)
-            print(f"\n📋 Processing complete! Found {len(result.get('entities', []))} entities")
+            print(f"\nProcessing complete! Found {len(result.get('entities', []))} entities")
         except Exception as e:
-            print(f"❌ PDF processing failed: {e}")
+            print(f"PDF processing failed: {e}")
             success = False
 
     # Run tests
@@ -247,12 +247,12 @@ Examples:
         if success:  # Only start API if everything else succeeded
             start_api()
         else:
-            print("❌ Skipping API start due to previous failures")
+            print("Skipping API start due to previous failures")
 
     if success:
-        print("\n🎉 Pipeline completed successfully!")
+        print("\nPipeline completed successfully!")
     else:
-        print("\n❌ Pipeline completed with errors!")
+        print("\nPipeline completed with errors!")
         sys.exit(1)
 
 

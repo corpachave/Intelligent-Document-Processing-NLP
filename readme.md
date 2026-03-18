@@ -1,33 +1,114 @@
-# Legal Contract Intelligence System
+# Fintech Intelligent Document Processing (NLP)
 
-Building an NLP-based system to convert unstructured legal PDF contracts into structured, searchable data.
+An end-to-end Document AI pipeline that converts unstructured legal/financial PDF documents into structured, searchable data using OCR, NLP, and rule-based validation.
 
-Design an end-to-end pipeline including OCR, text preprocessing, Named Entity Recognition (NER), and clause classification using fine-tuned transformer models (BERT/Legal-BERT). Extract key entities such as parties, loan amounts, dates and legal clauses, and generate structured JSON outputs for database storage.
+## Project Overview
 
-Implement backend APIs using FastAPI and integrated PostgreSQL / Elasticsearch to enable contract-level search, filtering and clause retrieval.
+Legal and financial institutions deal with thousands of contracts in PDF format. These documents are:
+- Unstructured  
+- Lengthy  
+- Difficult to search manually  
 
-Evaluate models using Precision, Recall, and F1-score and deploy the system using Docker and AWS.
+This project builds an automated system that:
+- Extracts text from both digital and scanned PDFs
+- Identifies key entities (dates, parties, amounts, etc.)
+- Detects important legal clauses
+- Converts everything into structured JSON format
 
-## Prerequisites
+## Key Features
 
-This project uses **Tesseract OCR** via `pytesseract` for scanned PDF text extraction. You must have the Tesseract binary installed and accessible to Python.
+### 1. OCR Integration
+- Handles digital and scanned PDFs
+- Uses Tesseract OCR for image-to-text conversion
 
-### Windows (recommended)
+### 2. Named Entity Recognition (NER)
+- Extracts Dates, Organizations, Money, Legal entities
+- Built using spaCy
 
-1. Install Tesseract using `winget`:
+### 3. Clause Extraction
+- Detects Payment, Termination, Governing Law clauses
 
-```powershell
-winget install -e --id tesseract-ocr.tesseract --accept-source-agreements --accept-package-agreements
+### 4. Validation Layer
+- Regex correction
+- Stopword filtering
+- Entity cleanup
+
+### 5. API Integration
+- Built with FastAPI
+- Upload PDF → Get JSON output
+
+## Project Architecture
+
+PDF → Detection → OCR → Preprocessing → NER → Rules → Clauses → Validation → JSON
+
+## Project Structure
+
+├── run_pipeline.py  
+├── src/  
+│   ├── ocr/extractor.py  
+│   ├── ner/model.py  
+│   ├── validation/rules.py  
+│   ├── pipeline.py  
+│   └── api/app.py  
+├── data/  
+├── models/  
+├── tests/  
+
+## Installation
+
+```bash
+git clone https://github.com/corpachave/Fintech---Intelligent-Document-Processing-NLP-.git
+cd Fintech---Intelligent-Document-Processing-NLP
+python -m venv venv
+venv\Scripts\activate
+pip install -r requirements.txt
 ```
 
-2. Ensure the installation path is set in your environment variables (for example):
+## Usage
 
-```powershell
-setx TESSERACT_CMD "C:\Program Files\Tesseract-OCR\tesseract.exe"
+```bash
+python run_pipeline.py --all
+python run_pipeline.py --train
+python run_pipeline.py --process file.pdf
+python run_pipeline.py --api
 ```
 
-3. Restart your terminal/IDE so the environment variable is picked up.
+## API
 
-Alternatively, you can set `TESSERACT_PATH` or `TESSERACT_CMD` to the location of `tesseract.exe`.
+POST /extract → Upload PDF  
+GET /docs → Swagger UI  
 
-> If you see `pytesseract.pytesseract.TesseractNotFoundError`, it means Python cannot find the Tesseract binary on your system PATH or via the configured environment variables.
+## Example Output
+
+```json
+{
+  "text": "Agreement...",
+  "entities": [{"text": "2025-12-01", "label": "DATE"}],
+  "clauses": [{"type": "payment_clause"}]
+}
+```
+
+## Dataset
+
+Stored in:
+data/annotations/train.jsonl
+
+## Testing
+
+```bash
+python -m pytest
+```
+
+## Future Improvements
+
+- BERT fine-tuning  
+- Better accuracy  
+- Multi-language support  
+
+## Author
+
+K. SIONE CORPACHAVE
+
+## Summary
+
+A complete Document AI pipeline combining OCR + NLP + API to convert contracts into structured data.
