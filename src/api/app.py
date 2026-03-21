@@ -6,23 +6,27 @@ import os
 import shutil
 import tempfile
 from src.pipeline import extract_entities_from_pdf
+from typing import Dict, List
 
 app = FastAPI(title="LexiScan Auto - Contract Entity Extractor")
 
 
+# Clause model (unchanged)
 class Clause(BaseModel):
     type: str
     text: str
 
 
-class ExtractionResponse(BaseModel):
+# FIXED response model
+class ExtractResponse(BaseModel):
     text: str
-    entities: list
-    clauses: list[Clause] = []
+    entities: Dict[str, List[str]]
+    clauses: List[Clause]   # 🔥 FIXED HERE
 
 
-@app.post("/extract", response_model=ExtractionResponse)
+@app.post("/extract", response_model=ExtractResponse)
 async def extract_pdf(file: UploadFile = File(...), strict: bool = False):
+
     if not file.filename.lower().endswith(".pdf"):
         raise HTTPException(status_code=400, detail="Only PDF files are supported")
 
@@ -32,9 +36,16 @@ async def extract_pdf(file: UploadFile = File(...), strict: bool = False):
 
     try:
         result = extract_entities_from_pdf(tmp_path, strict_mode=strict)
-        if "clauses" not in result:
+
+        # Ensure correct structure
+        if "entities" not in result or not isinstance(result["entities"], dict):
+            result["entities"] = {}
+
+        if "clauses" not in result or not isinstance(result["clauses"], list):
             result["clauses"] = []
+
         return result
+
     finally:
         try:
             os.remove(tmp_path)

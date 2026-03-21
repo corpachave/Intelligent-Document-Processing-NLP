@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Complete Pipeline Runner for Fintech Document Processing
 
@@ -17,6 +16,7 @@ Usage:
     python run_pipeline.py --all                     # Run everything
 """
 
+from html import entities
 import os
 import sys
 import json
@@ -30,7 +30,6 @@ ROOT_DIR = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT_DIR))
 
 from src.pipeline import extract_entities_from_pdf
-from src.ner.model import train_ner
 from src.ocr.extractor import extract_text
 
 
@@ -90,41 +89,42 @@ def process_pdf(pdf_path: str, output_path: str = None) -> Dict[str, Any]:
         raise FileNotFoundError(f"PDF not found: {pdf_path}")
 
     try:
-        # Extract text first
-        print("Extracting text...")
-        text = extract_text(pdf_path)
-        print(f"Extracted {len(text)} characters")
-
-        # Extract entities
-        print("Extracting entities...")
+        # Run full pipeline (handles OCR internally)
+        print("Running full pipeline (OCR + NER + Validation)...")
         result = extract_entities_from_pdf(pdf_path)
 
-        # Show summary
-        entities = result.get("entities", [])
-        print(f"Found {len(entities)} entities")
+        text = result.get("text", "")
+        entities = result.get("entities", {})
+        clauses = result.get("clauses", {})
 
-        # Count by type
-        entity_counts = {}
-        for ent in entities:
-            label = ent.get("label", "UNKNOWN")
-            entity_counts[label] = entity_counts.get(label, 0) + 1
+        print(f"Extracted {len(text)} characters")
 
-        print("Entity breakdown:")
-        for label, count in entity_counts.items():
-            print(f"      {label}: {count}")
+        # entity counting for grouped format
+        total_entities = sum(len(v) for v in entities.values())
+        print(f"Found {total_entities} entities")
+
+        print("\nSample Entities:")
+        for label, values in entities.items():
+            print(f"{label}: {values[:2]}")
+
+        # Show clauses summary
+        if clauses:
+            print("\nClauses detected:")
+            for k, v in clauses.items():
+                if v:
+                    print(f"   {k}: found")
 
         # Save output if requested
         if output_path:
             with open(output_path, "w", encoding="utf-8") as f:
                 json.dump(result, f, indent=2, ensure_ascii=False)
-            print(f"Saved results to: {output_path}")
+            print(f"\nSaved results to: {output_path}")
 
         return result
 
     except Exception as e:
         print(f"Processing failed: {e}")
         raise
-
 
 def run_tests():
     """Run all unit tests."""

@@ -1,22 +1,47 @@
-#4 Add API + pipeline 
-## src/pipeline.py
+# Pipeline to extract text from PDF, run NER, and apply validation rules
+
 from src.ocr.extractor import extract_text
-from src.ner.model import load_model, extract_entities
+from src.ner.model import extract_entities
 from src.validation.rules import validate_entities, classify_clauses
 
-DEFAULT_MODEL_DIR = "models/ner"
+def group_entities(entities):
+    grouped = {}
+    for e in entities:
+        label = e["label"]
+        grouped.setdefault(label, []).append(e["text"])
+    return grouped
+
 PRODUCTION_CONFIDENCE_THRESHOLD = 0.7
 
 
-def extract_entities_from_pdf(pdf_path: str, model_dir: str = DEFAULT_MODEL_DIR, strict_mode: bool = False):
+def extract_entities_from_pdf(pdf_path: str, strict_mode: bool = False):
+    """
+    End-to-end pipeline:
+    PDF → Text → NER → Validation → Clause Extraction → JSON
+    """
+
+    # Step 1: Extract text (OCR or direct)
     text = extract_text(pdf_path)
-    model = load_model(model_dir)
-    entities = extract_entities(model, text, strict_mode=strict_mode)
+
+    # Step 2: Run NER (BERT-based)
+    entities = extract_entities(text, strict_mode=strict_mode)
+
+    # Step 3: Additional validation layer (optional but good)
     validated = validate_entities(entities)
 
-    # Production strict output: filter by confidence for downstream systems
+    # Step 4: Production filtering (final safety layer)
     if strict_mode:
-        validated = [e for e in validated if e.get("confidence", 0.0) >= PRODUCTION_CONFIDENCE_THRESHOLD]
+        validated = [
+            e for e in validated
+            if e.get("confidence", 0.0) >= PRODUCTION_CONFIDENCE_THRESHOLD
+        ]
 
+    # Step 5: Clause extraction
     clauses = classify_clauses(text)
-    return {"text": text, "entities": validated, "clauses": clauses}
+
+    # Final Output
+    return {
+    "text": text,
+    "entities": group_entities(validated),
+    "clauses": clauses
+}

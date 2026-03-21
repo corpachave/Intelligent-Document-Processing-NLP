@@ -1,114 +1,185 @@
-# Fintech Intelligent Document Processing (NLP)
+# LexiScan Auto – Legal Contract Entity Extractor
 
-An end-to-end Document AI pipeline that converts unstructured legal/financial PDF documents into structured, searchable data using OCR, NLP, and rule-based validation.
+An end-to-end Intelligent Document Processing (IDP) system for extracting structured information from legal contracts using OCR and NLP.
 
-## Project Overview
+## Overview
 
-Legal and financial institutions deal with thousands of contracts in PDF format. These documents are:
-- Unstructured  
-- Lengthy  
-- Difficult to search manually  
+**LexiScan Auto** is designed for financial/legal organizations that process large volumes of contracts. It automates the extraction of key entities such as:
 
-This project builds an automated system that:
-- Extracts text from both digital and scanned PDFs
-- Identifies key entities (dates, parties, amounts, etc.)
-- Detects important legal clauses
-- Converts everything into structured JSON format
+- Dates  
+- Monetary Values  
+- Organizations  
+- Persons  
+- Legal Clauses  
+
+The system converts raw PDFs (including scanned documents) into structured, machine-readable JSON.
+
+## Architecture
+
+PDF → OCR → Text Cleaning → BERT NER → Validation → Clause Extraction → API → JSON Output
+
+## Tech Stack
+
+- Python  
+- Transformers (Hugging Face)  
+- Legal-BERT (`nlpaueb/legal-bert-base-uncased`)  
+- FastAPI  
+- Tesseract OCR  
+- pdf2image  
+- Docker  
 
 ## Key Features
 
-### 1. OCR Integration
-- Handles digital and scanned PDFs
-- Uses Tesseract OCR for image-to-text conversion
+### OCR Integration
+- Supports both native PDFs and scanned documents  
+- Converts images → text using Tesseract  
 
-### 2. Named Entity Recognition (NER)
-- Extracts Dates, Organizations, Money, Legal entities
-- Built using spaCy
+### Custom NER (Legal-BERT)
+- Fine-tuned transformer model  
+- BIO tagging format  
+- Extracts:
+  - DATE, MONEY, ORG, PERSON, LAW, CLAUSE  
 
-### 3. Clause Extraction
-- Detects Payment, Termination, Governing Law clauses
+### Post-processing & Validation
+- Regex validation (DATE, MONEY)  
+- Stopword filtering  
+- Confidence threshold filtering  
+- Entity cleanup  
 
-### 4. Validation Layer
-- Regex correction
-- Stopword filtering
-- Entity cleanup
+### Clause Extraction
+- Detects:
+  - Payment clauses  
+  - Governing law clauses  
+  - Termination-related clauses  
 
-### 5. API Integration
-- Built with FastAPI
-- Upload PDF → Get JSON output
+### Clean API Output
 
-## Project Architecture
-
-PDF → Detection → OCR → Preprocessing → NER → Rules → Clauses → Validation → JSON
-
-## Project Structure
-
-├── run_pipeline.py  
-├── src/  
-│   ├── ocr/extractor.py  
-│   ├── ner/model.py  
-│   ├── validation/rules.py  
-│   ├── pipeline.py  
-│   └── api/app.py  
-├── data/  
-├── models/  
-├── tests/  
-
-## Installation
-
-```bash
-git clone https://github.com/corpachave/Fintech---Intelligent-Document-Processing-NLP-.git
-cd Fintech---Intelligent-Document-Processing-NLP
-python -m venv venv
-venv\Scripts\activate
-pip install -r requirements.txt
-```
-
-## Usage
-
-```bash
-python run_pipeline.py --all
-python run_pipeline.py --train
-python run_pipeline.py --process file.pdf
-python run_pipeline.py --api
-```
-
-## API
-
-POST /extract → Upload PDF  
-GET /docs → Swagger UI  
-
-## Example Output
+Entities are grouped for production usability:
 
 ```json
 {
-  "text": "Agreement...",
-  "entities": [{"text": "2025-12-01", "label": "DATE"}],
-  "clauses": [{"type": "payment_clause"}]
+  "entities": {
+    "ORG": ["ABC Corp"],
+    "DATE": ["2024-01-01"],
+    "MONEY": ["$5000"]
+  }
 }
-```
 
-## Dataset
+■ FastAPI Microservice
 
-Stored in:
-data/annotations/train.jsonl
+Upload PDF → Get structured JSON
+Interactive Swagger UI
 
-## Testing
+■ Project Structure
 
-```bash
-python -m pytest
-```
+├── src/
+│   ├── api/            # FastAPI application
+│   ├── ner/            # BERT NER model + inference
+│   ├── ocr/            # OCR pipeline
+│   ├── validation/     # Rule-based validation
+│   └── pipeline.py     # End-to-end pipeline
+│
+├── models/             # Trained Legal-BERT model
+├── data/               # Training data (JSONL)
+├── scripts/            # Training scripts
+├── tests/              # Unit tests
+├── run_pipeline.py     # CLI runner
+└── README.md 
 
-## Future Improvements
+■ How to Run?
 
-- BERT fine-tuning  
-- Better accuracy  
-- Multi-language support  
+1️⃣ Install Dependencies
 
-## Author
+pip install -r requirements.txt
 
-K. SIONE CORPACHAVE
+2️⃣ Run Full Pipeline (CLI)
 
-## Summary
+Process a PDF:
 
-A complete Document AI pipeline combining OCR + NLP + API to convert contracts into structured data.
+python run_pipeline.py --process data/raw_pdfs/sample.pdf
+
+Save output:
+
+python run_pipeline.py --process sample.pdf --output result.json
+
+3️⃣ Start API Server
+
+python run_pipeline.py --api
+
+Open Swagger UI:
+
+http://localhost:8001/docs
+
+4️⃣ API Usage
+
+POST /extract
+
+Upload a PDF → get structured output:
+
+{
+  "text": "...",
+  "entities": {
+    "ORG": ["ABC Corp"],
+    "MONEY": ["$5000"]
+  },
+  "clauses": [
+    {
+      "type": "payment_clause",
+      "text": "The borrower shall pay..."
+    }
+  ]
+}
+
+■ Model Details
+
+Base Model: Legal-BERT
+Task: Token Classification (NER)
+Labels:
+O, B/I-DATE, B/I-MONEY, B/I-ORG, B/I-PERSON, B/I-LAW, B/I-CLAUSE
+Metrics:
+Precision, Recall, F1-score
+
+■ Testing
+
+python run_pipeline.py --test
+
+■ Docker (Optional)
+
+Build:
+docker build -t lexiscan-auto .
+
+Run:
+docker run -p 8001:8001 lexiscan-auto
+
+■ Production Highlights
+
+▪ Modular architecture
+▪ Scalable API design
+▪ Clean structured outputs
+▪ OCR + NLP integration
+▪ Real-world legal use case
+
+■ Future Improvements
+
+▪ Replace rule-based clause extraction with transformer-based model
+▪ Add document classification
+▪ Improve OCR accuracy with layout-aware models
+▪ Deploy on cloud (AWS/GCP)
+
+■ Use Case
+
+A financial law firm can:
+▪ Upload contracts
+▪ Automatically extract key entities
+▪ Index documents for search
+▪ Reduce manual review time
+
+■ Author
+
+Sione Corpachave
+
+■ Project Status
+End-to-end pipeline complete
+▪ API working
+▪ Model integrated
+▪ Ready for demo & deployment
