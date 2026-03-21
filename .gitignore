@@ -50,3 +50,8 @@ dist/
 .DS_Store
 Thumbs.db
 # ----------------------
+
+models/
+checkpoints/
+*.bin
+*.pt
