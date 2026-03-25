@@ -64,14 +64,14 @@ Entities are grouped for production usability:
     "MONEY": ["$5000"]
   }
 }
-
-■ FastAPI Microservice
+```
+## FastAPI Microservice
 
 Upload PDF → Get structured JSON
 Interactive Swagger UI
 
-■ Project Structure
-
+## Project Structure
+```
 ├── src/
 │   ├── api/            # FastAPI application
 │   ├── ner/            # BERT NER model + inference
@@ -85,37 +85,40 @@ Interactive Swagger UI
 ├── tests/              # Unit tests
 ├── run_pipeline.py     # CLI runner
 └── README.md 
+```
+## How to Run?
 
-■ How to Run?
-
-1️⃣ Install Dependencies
+### 1️⃣ Install Dependencies
 
 pip install -r requirements.txt
 
-2️⃣ Run Full Pipeline (CLI)
+### 2️⃣ Model Setup
+The trained model checkpoints are not included in the repository due to size limits.
+They will be automatically downloaded from Google Drive when you run the project.
 
-Process a PDF:
+Alternatively, run manually:
+  python download_assets.py
+
+### 3️⃣ Run Full Pipeline (CLI)
+
+#### Process a PDF:
 
 python run_pipeline.py --process data/raw_pdfs/sample.pdf
 
-Save output:
+#### Save output:
 
 python run_pipeline.py --process sample.pdf --output result.json
 
-3️⃣ Start API Server
+### 4️⃣ Start API Server
 
 python run_pipeline.py --api
 
-Open Swagger UI:
-
-http://localhost:8001/docs
-
-4️⃣ API Usage
+### 5️⃣ API Usage
 
 POST /extract
 
 Upload a PDF → get structured output:
-
+```
 {
   "text": "...",
   "entities": {
@@ -129,21 +132,21 @@ Upload a PDF → get structured output:
     }
   ]
 }
+```
+## Model Details
 
-■ Model Details
+- Base Model: Legal-BERT
+- Task: Token Classification (NER)
+- Labels:
+  - O, B/I-DATE, B/I-MONEY, B/I-ORG, B/I-PERSON, B/I-LAW, B/I-CLAUSE
+- Metrics:
+  - Precision, Recall, F1-score
 
-Base Model: Legal-BERT
-Task: Token Classification (NER)
-Labels:
-O, B/I-DATE, B/I-MONEY, B/I-ORG, B/I-PERSON, B/I-LAW, B/I-CLAUSE
-Metrics:
-Precision, Recall, F1-score
-
-■ Testing
+## Testing
 
 python run_pipeline.py --test
 
-■ Docker (Optional)
+## Docker (Optional)
 
 Build:
 docker build -t lexiscan-auto .
@@ -151,35 +154,35 @@ docker build -t lexiscan-auto .
 Run:
 docker run -p 8001:8001 lexiscan-auto
 
-■ Production Highlights
+## Production Highlights
 
-▪ Modular architecture
-▪ Scalable API design
-▪ Clean structured outputs
-▪ OCR + NLP integration
-▪ Real-world legal use case
+- Modular architecture
+- Scalable API design
+- Clean structured outputs
+- OCR + NLP integration
+- Real-world legal use case
 
-■ Future Improvements
+## Future Improvements
 
-▪ Replace rule-based clause extraction with transformer-based model
-▪ Add document classification
-▪ Improve OCR accuracy with layout-aware models
-▪ Deploy on cloud (AWS/GCP)
+- Replace rule-based clause extraction with transformer-based model
+- Add document classification
+- Improve OCR accuracy with layout-aware models
+- Deploy on cloud (AWS/GCP)
 
-■ Use Case
+## Use Case
 
 A financial law firm can:
-▪ Upload contracts
-▪ Automatically extract key entities
-▪ Index documents for search
-▪ Reduce manual review time
+  - Upload contracts
+  - Automatically extract key entities
+  - Index documents for search
+  - Reduce manual review time
 
-■ Author
+## Author
 
 Sione Corpachave
 
-■ Project Status
+## Project Status
 End-to-end pipeline complete
-▪ API working
-▪ Model integrated
-▪ Ready for demo & deployment
+  - API working
+  - Model integrated
+  - Ready for demo & deployment
